@@ -1,0 +1,22 @@
+text {
+    font: 12px sans-serif;
+}
+svg {
+    display: block;
+}
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+main {
+    height: 100%;
+    margin-top: 64px;
+}
+section{
+    height: 50%;
+}
+header {
+    position: fixed;
+}

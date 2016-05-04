@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js" charset="utf-8"></script>
+
+  <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
+  <link href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css" rel="stylesheet" type="text/css">
+
+  <script src="/cardboard.js"></script>
+  <link href="/cardboard.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+<header>
+  <ul id="taglist" class="navbar-right">
+  </ul>
+</header>
+
+<main class="container">
+
+</main>
+
+<script>
+  var queries=getQueries();
+  var tagMap={};
+  var dataMap={};
+  var chartMap={};
+  var counter=0;
+  queries["data"].split(";").forEach(function(url){
+    d3.json(url, function(error, dataset){
+      var cls = dataset["class"];
+      var fulltag = dataset["tag"];
+      if (!(fulltag in tagMap))
+      {
+          tagMap[fulltag] = String.fromCharCode(65 + counter);
+          counter++;
+          d3.select("#taglist").append("li").text(tagMap[fulltag] + " - " + fulltag);
+      }
+      if (cls in dataMap)
+      {
+        dataMap[cls] = fromDataset(tagMap[fulltag], dataset["series"], queries, dataMap[cls]);
+      } else {
+        // create the chart
+        var section = d3.select("main").append("section");
+        section.classed("with-3d-shadow with-transitions");
+        section.append("h2").text(cls);
+        var svg = section.append("svg");
+
+        dataMap[cls] = fromDataset(tagMap[fulltag], dataset["series"], queries, []);
+
+        nv.addGraph(function() {
+            var baseChart;
+            switch(dataset["type"]) {
+                case "line": baseChart = nv.models.lineChart(); break;
+                case "scatter": baseChart = nv.models.scatterChart(); break;
+            }
+            var xscale;
+            switch(dataset["xscale"]) {
+                case "time": xscale = d3.time.scale.utc(); break;
+                default: d3.scale.linear();
+            }
+            var chart = baseChart
+                .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+                .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+                .showYAxis(true)        //Show the y-axis
+                .showXAxis(true)        //Show the x-axis
+                .xScale(xscale);
+            ;
+            if(dataset["xscale"] === "time")
+            {
+                chart.xAxis.tickFormat(d3.time.format('%H:%M:%S'));
+                chart.x(function(d, i) {
+                    return new Date(d["x"]) });
+            } else {
+              chart.xAxis
+                  .axisLabel(dataset["xlabel"])
+                  .tickFormat(d3.format(dataset["xformat"]));
+            };
+            chart.yAxis
+                .axisLabel(dataset["ylabel"])
+                .tickFormat(d3.format(dataset["yformat"]));
+
+            svg.datum(dataMap[cls]).call(chart);
+
+            addZoom(chart, svg);
+            nv.utils.windowResize(chart.update);
+
+            return chart;
+        });
+      }
+    });
+    });
+
+</script>
+</body>
+</html>
