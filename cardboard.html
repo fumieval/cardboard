@@ -22,7 +22,7 @@
 
 </main>
 
-<script>
+<script type="text/javascript">
   var queries=getQueries();
   var tagMap={};
   var dataMap={};
@@ -32,67 +32,31 @@
     d3.json(url, function(error, dataset){
       var cls = dataset["class"];
       var fulltag = dataset["tag"];
-      if (!(fulltag in tagMap))
-      {
-          tagMap[fulltag] = String.fromCharCode(65 + counter);
-          counter++;
-          d3.select("#taglist").append("li").text(tagMap[fulltag] + " - " + fulltag);
+      var shorttag;
+
+      if (fulltag in tagMap){
+        shorttag = tagMap[fulltag];
+      } else { // give a unique identifier (A, B, C, ...) for each tag
+        shorttag = String.fromCharCode(65 + counter);
+        counter++;
+        d3.select("#taglist").append("li").text(shorttag + " - " + fulltag);
+        tagMap[fulltag] = shorttag;
       }
-      if (cls in dataMap)
-      {
-        dataMap[cls] = fromDataset(tagMap[fulltag], dataset["series"], queries, dataMap[cls]);
+
+      if (cls in dataMap){ // extend a set of series
+        dataMap[cls] = fromDataset(shorttag, dataset["series"], queries, dataMap[cls]);
       } else {
-        // create the chart
         var section = d3.select("main").append("section");
         section.classed("with-3d-shadow with-transitions");
         section.append("h2").text(cls);
         var svg = section.append("svg");
 
-        dataMap[cls] = fromDataset(tagMap[fulltag], dataset["series"], queries, []);
+        dataMap[cls] = fromDataset(shorttag, dataset["series"], queries, []);
 
-        nv.addGraph(function() {
-            var baseChart;
-            switch(dataset["type"]) {
-                case "line": baseChart = nv.models.lineChart(); break;
-                case "scatter": baseChart = nv.models.scatterChart(); break;
-            }
-            var xscale;
-            switch(dataset["xscale"]) {
-                case "time": xscale = d3.time.scale.utc(); break;
-                default: d3.scale.linear();
-            }
-            var chart = baseChart
-                .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
-                .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
-                .showYAxis(true)        //Show the y-axis
-                .showXAxis(true)        //Show the x-axis
-                .xScale(xscale);
-            ;
-            if(dataset["xscale"] === "time")
-            {
-                chart.xAxis.tickFormat(d3.time.format('%H:%M:%S'));
-                chart.x(function(d, i) {
-                    return new Date(d["x"]) });
-            } else {
-              chart.xAxis
-                  .axisLabel(dataset["xlabel"])
-                  .tickFormat(d3.format(dataset["xformat"]));
-            };
-            chart.yAxis
-                .axisLabel(dataset["ylabel"])
-                .tickFormat(d3.format(dataset["yformat"]));
-
-            svg.datum(dataMap[cls]).call(chart);
-
-            addZoom(chart, svg);
-            nv.utils.windowResize(chart.update);
-
-            return chart;
-        });
+        addChart(svg, dataset, dataMap);
       }
     });
-    });
-
+  });
 </script>
 </body>
 </html>

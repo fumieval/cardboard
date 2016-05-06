@@ -89,3 +89,45 @@ function addZoom(chart, svg) {
 
   svg.call(d3zoom).on('dblclick.zoom', unzoomed);
 };
+
+function addChart(svg, dataset, dataMap){
+  nv.addGraph(function() {
+    var baseChart;
+    switch(dataset["type"]) {
+        case "line": baseChart = nv.models.lineChart(); break;
+        case "scatter": baseChart = nv.models.scatterChart(); break;
+    }
+    var xscale;
+    switch(dataset["xscale"]) {
+        case "time": xscale = d3.time.scale.utc(); break;
+        default: d3.scale.linear();
+    }
+    var chart = baseChart
+        .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+        .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+        .showYAxis(true)        //Show the y-axis
+        .showXAxis(true)        //Show the x-axis
+        .xScale(xscale);
+    ;
+    if(dataset["xscale"] === "time")
+    {
+        chart.xAxis.tickFormat(d3.time.format('%H:%M:%S'));
+        chart.x(function(d, i) {
+            return new Date(d["x"]) });
+    } else {
+      chart.xAxis
+          .axisLabel(dataset["xlabel"])
+          .tickFormat(d3.format(dataset["xformat"]));
+    };
+    chart.yAxis
+        .axisLabel(dataset["ylabel"])
+        .tickFormat(d3.format(dataset["yformat"]));
+
+    svg.datum(dataMap[dataset["class"]]).call(chart);
+
+    addZoom(chart, svg);
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+}
