@@ -1,8 +1,9 @@
+'use strict';
 
 function fromDataset(tag, dataset, queries, data) {
-  enabled=queries["enabled"];
+  var enabled=queries["enabled"];
   Object.keys(dataset).forEach(function(k){
-        vals = [];
+        var vals = [];
         dataset[k].forEach(function(v){
             vals.push({x: v[0], y: v[1]});
         });
@@ -27,7 +28,7 @@ function getQueries()
       .slice(window.location.href.indexOf('?') + 1)
       .split('&')
       .forEach(function(q){
-          kv = q.split('=');
+          var kv = q.split('=');
           vars.push(kv[0]);
           vars[kv[0]] = kv[1];
       }
@@ -100,7 +101,7 @@ function addChart(svg, dataset, dataMap){
     var xscale;
     switch(dataset["xscale"]) {
         case "time": xscale = d3.time.scale.utc(); break;
-        default: d3.scale.linear();
+        default: xscale = d3.scale.linear();
     }
     var chart = baseChart
         .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
@@ -116,8 +117,7 @@ function addChart(svg, dataset, dataMap){
             return new Date(d["x"]) });
     } else {
       chart.xAxis
-          .axisLabel(dataset["xlabel"])
-          .tickFormat(d3.format(dataset["xformat"]));
+          .axisLabel(dataset["xlabel"]).tickFormat(d3.format(dataset["xformat"]));
     };
     chart.yAxis
         .axisLabel(dataset["ylabel"])
