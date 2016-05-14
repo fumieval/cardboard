@@ -15,7 +15,10 @@ main {
     margin-top: 64px;
 }
 section{
-    height: 50%;
+    height: 480px;
+    width: 480px;
+    float:left;
+    margin-top: 40px;
 }
 header {
     position: fixed;

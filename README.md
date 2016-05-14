@@ -9,7 +9,7 @@ $ python3 -m http.server 8000
 
 Then access `http://localhost:8000/cardboard.html?data=/path/to/foo.json;/path/to/bar.json`
 
-The json files should be like
+The json files should be a list of objects like
 
 ```js
 { "xlabel": "x"
