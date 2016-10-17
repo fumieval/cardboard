@@ -18,7 +18,11 @@
   </ul>
 </header>
 
-<main class="container">
+<nav class="sidebar">
+
+</nav>
+
+<main>
 
 </main>
 
@@ -50,11 +54,10 @@
           var section = d3.select("main").append("section");
           section.classed("with-3d-shadow with-transitions");
           section.append("h2").text(cls);
-          var svg = section.append("svg");
 
           dataMap[cls] = fromDataset(shorttag, dataset["series"], queries, []);
 
-          addChart(svg, dataset, dataMap);
+          addChart(section, dataset, dataMap);
         }
       });
     });

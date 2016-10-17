@@ -86,12 +86,13 @@ function addZoom(chart, svg) {
   };
 
   // initialize wrapper
-  d3zoom.x(xScale).y(yScale).scaleExtent([1, scaleExtent]).on('zoom', zoomed);
+  d3zoom.x(xScale).scaleExtent([1, scaleExtent]).on('zoom', zoomed);
 
   svg.call(d3zoom).on('dblclick.zoom', unzoomed);
 };
 
-function addChart(svg, dataset, dataMap){
+function addChart(section, dataset, dataMap){
+  var svg = section.append("svg");
   nv.addGraph(function() {
     var baseChart;
     switch(dataset["type"]) {
@@ -130,4 +131,11 @@ function addChart(svg, dataset, dataMap){
 
     return chart;
   });
+}
+
+function addSection(section, dataset, dataMap){
+  switch(dataset["type"]) {
+      case "table": addTable(section, dataset, dataMap); break;
+      default: baseChart = nv.models.scatterChart();
+  }
 }

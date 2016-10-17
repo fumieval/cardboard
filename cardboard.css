@@ -9,17 +9,44 @@ html, body {
     width: 100%;
     margin: 0px;
     padding: 0px;
+    background: #131009;
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-size: 100% auto;
+}
+h2 {
+    margin: 0px;
+}
+* {
+    box-sizing: border-box;
 }
 main {
     height: 100%;
+    width: 100%;
     margin-top: 64px;
 }
-section{
-    height: 480px;
-    width: 480px;
+.sidebar {
+    /* position: fixed; */
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 240px;
     float:left;
-    margin-top: 40px;
+    background: #302f17;
+}
+section{
+    height: 640px;
+    width: 640px;
+    float:left;
+    margin: 10px;
+    padding: 10px;
+    background-color: rgba(255,255,255,0.9);
+    box-shadow: 0 0px 10px rgba(255,255,255,0.8);
 }
 header {
     position: fixed;
+    top:0;
+    right: 0;
+    left: 0;
+    background: white;
 }
