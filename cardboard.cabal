@@ -1,0 +1,43 @@
+name:                cardboard
+version:             0
+synopsis:            Simple content storage
+homepage:            https://github.com/fumieval/cardboard
+bug-reports:         http://github.com/fumieval/cardboard/issues
+description:         Simple data management tool
+license:             BSD3
+license-file:        LICENSE
+author:              Fumiaki Kinoshita
+maintainer:          Fumiaki Kinoshita <fumiexcel@gmail.com>
+copyright:           Copyright (C) 2016 Fumiaki Kinoshita
+category:            Web
+build-type:          Simple
+stability:           experimental
+
+extra-source-files:
+  .gitignore
+  README.md
+  CHANGELOG.md
+cabal-version:       >=1.10
+
+source-repository head
+  type: git
+  location: https://github.com/fumieval/cardboard.git
+
+executable cardboard
+  main-is: Main.hs
+  ghc-options: -O2 -Wall -threaded
+  hs-source-dirs: app
+  build-depends: base
+    , wai
+    , wai-app-static
+    , warp
+    , aeson
+    , persistent
+    , persistent-sqlite
+    , bytestring
+    , transformers
+    , http-types
+    , persistent-template
+    , text
+    , resourcet
+    , monad-logger
