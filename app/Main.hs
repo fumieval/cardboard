@@ -93,4 +93,5 @@ main = do
         return $ responseLBS status200 [] "Done"
       _ -> sendResp $ responseLBS status400 [] "Bad Request"
 
+    [] -> staticApp (defaultWebAppSettings "web") req { pathInfo = ["cardboard.html"]} sendResp
     _ -> staticApp (defaultWebAppSettings "web") req sendResp
