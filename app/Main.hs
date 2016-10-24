@@ -4,7 +4,6 @@ module Main where
 import Control.Monad.IO.Class
 import Control.Monad.Logger
 import Control.Monad.Trans.Maybe
-import Control.Monad.Trans.Resource
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 import Database.Persist
@@ -55,10 +54,9 @@ main = do
 
     ["tag", tag] -> case requestMethod req of
       "GET" -> runDb (getBy (UniqueTag tag)) >>= \case
-        Just c -> sendResp $ responseLBS status200 [] ""
+        Just _ -> sendResp $ responseLBS status200 [] ""
         Nothing -> sendResp $ responseLBS status404 [] "Not found"
       "POST" -> do
-        body <- strictRequestBody req
         _ <- runDb $ upsert (Tag tag) []
         sendResp $ responseLBS status200 [] "Done"
       "DELETE" -> do
