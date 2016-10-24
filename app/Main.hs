@@ -61,6 +61,9 @@ main = do
         body <- strictRequestBody req
         _ <- runDb $ upsert (Tag tag) []
         sendResp $ responseLBS status200 [] "Done"
+      "DELETE" -> do
+        runDb $ deleteBy (UniqueTag tag)
+        sendResp $ responseLBS status200 [] "Done"
       _ -> sendResp $ responseLBS status400 [] "Bad Request"
 
     ["class", cls] -> case requestMethod req of
@@ -70,6 +73,9 @@ main = do
       "POST" -> do
         body <- strictRequestBody req
         _ <- runDb $ upsert (Class cls (BL.toStrict body)) []
+        sendResp $ responseLBS status200 [] "Done"
+      "DELETE" -> do
+        runDb $ deleteBy (UniqueClass cls)
         sendResp $ responseLBS status200 [] "Done"
       _ -> sendResp $ responseLBS status400 [] "Bad Request"
 
