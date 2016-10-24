@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="/cbor.js"></script>
   <script src="/cardboard.js"></script>
   <link href="/cardboard.css" rel="stylesheet" type="text/css">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
@@ -19,13 +21,66 @@
 </main>
 
 <script type="text/javascript">
+
+var activeTags = d3.set();
+var activeClasses = d3.map();
+var dataset = d3.map();
+
+function updateClass(cls, sel){
+  eval(activeClasses.get(cls))(sel, dataset.get(cls));
+}
+
+function addPayload(tag, cls, sel){
+  d3.request("/payload/" + tag + "/" + cls).responseType("arraybuffer").get(function(err, resp){
+    console.log(err);
+    if (!dataset.has(cls)) dataset.set(cls, d3.map());
+    dataset.get(cls).set(tag, resp.response);
+    updateClass(cls, sel);
+  });
+}
+
 d3.json("/tags", function(tags){
-    d3.select("#tags").selectAll('li').data(tags).enter().append("li")
-      .text(function(d) { return d; });
+  d3.select("#tags").selectAll('li').data(tags)
+    .enter().append("li").text(function(d) { return d; })
+    .on("click", function(tag){
+      if (activeTags.has(tag)){
+        activeTags.remove(tag);
+        d3.select("main").selectAll("section")
+          .each(function(cls, i){
+            dataset.get(cls).remove(tag);
+            updateClass(cls, d3.select(this));
+          });
+        d3.select(this).classed("active", false);
+      }else{
+        activeTags.add(tag);
+        d3.select("main").selectAll("section")
+          .each(function(cls, i){addPayload(tag, cls, d3.select(this))});
+        d3.select(this).classed("active", true);
+      }
+    });
 });
+
 d3.json("/classes", function(classes){
-    d3.select("#classes").selectAll('li').data(classes).enter().append("li")
-      .text(function(d) { return d; });
+  d3.select("#classes").selectAll('li').data(classes)
+    .enter().append("li").text(function(cls) { return cls; })
+    .on("click", function(cls){
+      var item = d3.select(this);
+      if (activeClasses.has(cls))
+      {
+        item.classed("active", false);
+        activeClasses.remove(cls);
+        dataset.remove(cls);
+        d3.select("main").select("#class-"+cls).remove();
+      }else{
+        d3.request("/class/" + cls).get(function(err, resp){
+          activeClasses.set(cls, "(" + resp.responseText + ")");
+          item.classed("active", true);
+          var sections = d3.select("main").selectAll("section").data(activeClasses.keys());
+          var section = sections.enter().append("section").attr("id", "class-"+cls);
+          activeTags.each(function(tag){addPayload(tag, cls, section)});
+        });
+      }
+    });
 });
 </script>
 </body>
